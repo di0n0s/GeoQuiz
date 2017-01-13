@@ -1,5 +1,6 @@
 package com.bignerdrach.android.geoquiz;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.PersistableBundle;
 import android.os.StrictMode;
@@ -44,14 +45,17 @@ public class QuizActivity extends AppCompatActivity {
     private void checkAnswer(boolean userPressedTrue){
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnsweerTrue();
 
-        int messageResId = 0;
+        int messageResId;
 
-        if (userPressedTrue == answerIsTrue){
-            messageResId = R.string.correct_toast;
+        if(mIsCheater){
+            messageResId = R.string.judgment_toast;
         } else {
-            messageResId = R.string.incorrect_toast;
+            if (userPressedTrue == answerIsTrue) {
+                messageResId = R.string.correct_toast;
+            } else {
+                messageResId = R.string.incorrect_toast;
+            }
         }
-
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
 
@@ -107,6 +111,19 @@ public class QuizActivity extends AppCompatActivity {
         }
 
         updateQuestion();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != Activity.RESULT_OK){
+            return;
+        }
+        if(requestCode == REQUEST_CODE_CHEAT){
+            if(data == null){
+                return;
+            }
+            mIsCheater = CheatActivity.wasAnswerShown(data);
+        }
     }
 
     @Override
